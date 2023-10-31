@@ -71,20 +71,22 @@ public class SinkConnector implements Sink<GenericObject> {
 
     @Override
     public void write(Record<GenericObject> record) throws Exception {
-        if (log.isDebugEnabled()) {
-            record.getMessage().ifPresent(m -> {
-                log.debug("Received message: {}", m.getMessageId());
-            });
-        }
+        record.getMessage().ifPresent(m -> {
+            log.debug("Received message: {}", m.getMessageId());
+            log.info("DEBUG-Received Message ID" + m.getMessageId());
+        });
+
+        log.info("DEBUG-Received message: " + record);
+
         while (!messages.offer(new PulsarSinkRecord(record), 1, TimeUnit.SECONDS)) {
             if (!writer.isRunning()) {
                 String err = "Exit caused by lakehouse writer stop working";
                 log.error("{}", err);
                 throw new LakehouseConnectorException(err);
             }
-            if (log.isDebugEnabled()) {
-                log.debug("pending on adding into the blocking queue.");
-            }
+
+            log.info("DEBUG-pending on adding into the blocking queue.");
+
         }
     }
 

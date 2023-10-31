@@ -98,13 +98,16 @@ public class DeltaWriter implements LakehouseWriter {
 
     @Override
     public void writeAvroRecord(GenericRecord record) throws IOException {
+        log.info("DEBUG-Writing record to parquet file: " + record);
         writer.writeToParquetFile(record);
     }
 
     @Override
     public boolean flush() {
         try {
+            log.info("DEBUG-Flush-commitFiles");
             commitFiles(writer.closeAndFlush());
+            log.info("DEBUG-Flush-returned");
             return true;
         } catch (IOException e) {
             log.error("Failed to close and commit parquet file into delta lake. ", e);
@@ -173,9 +176,12 @@ public class DeltaWriter implements LakehouseWriter {
     }
 
     protected void commitFiles(List<DeltaParquetWriter.FileStat> fileStats) {
+        log.info("DEBUG-commitFiles Entered");
         if (fileStats == null || fileStats.isEmpty()) {
+            log.info("DEBUG-commitFiles Exited");
             return;
         }
+        log.info("DEBUG-commitFiles Continued");
 
         OptimisticTransaction optimisticTransaction = deltaLog.startTransaction();
         SetTransaction setTransaction = new SetTransaction(appId, optimisticTransaction.txnVersion(appId) + 1,
@@ -189,6 +195,7 @@ public class DeltaWriter implements LakehouseWriter {
             AddFile addFile = new AddFile(fileStat.getFilePath(), fileStat.getPartitionValues(), fileStat.getFileSize(),
                 System.currentTimeMillis(), true, "\"{}\"", null);
             filesToCommit.add(addFile);
+
         }
 
         log.info("Add parquet files: {}", filesToCommit);

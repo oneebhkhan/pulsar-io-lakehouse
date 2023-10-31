@@ -79,12 +79,15 @@ public class DeltaParquetFileWriter implements DeltaParquetWriter {
 
     @Override
     public void writeToParquetFile(GenericRecord record) throws IOException {
+        log.info("DEBUG-Writing record to parquet file: " + record);
         if (isClosed.get() || StringUtils.isBlank(currentFileFullPath)) {
             currentFileFullPath = generateNextFilePath(partitionColumnPath, tablePath, compression);
+            log.info("DEBUG-Writing record to filepath: " + currentFileFullPath);
             writer = openNewFile(currentFileFullPath, schema, configuration, compression);
             isClosed.set(false);
         }
         writer.write(record);
+        log.info("DEBUG-Record written to parquet file at: " + currentFileFullPath);
     }
 
     @VisibleForTesting
@@ -121,11 +124,15 @@ public class DeltaParquetFileWriter implements DeltaParquetWriter {
         if (writer != null) {
             try {
                 log.info("start to close internal parquet writer");
-                writer.close();
-            } catch (IOException e) {
-                log.error("close internal parquet writer failed. filePath: {}", currentFileFullPath, e);
-                throw e;
-            } finally {
+//                writer.close();
+                log.info("DEBUG-Thread name: " + Thread.currentThread().getName());
+                log.info("DEBUG-internal parquet writer closed");
+            }
+//            catch (IOException e) {
+//                log.error("close internal parquet writer failed. filePath: {}", currentFileFullPath, e);
+//                throw e;
+//            }
+            finally {
                 isClosed.set(true);
                 writer = null;
                 currentFileFullPath = "";
@@ -171,7 +178,7 @@ public class DeltaParquetFileWriter implements DeltaParquetWriter {
             .withDictionaryEncoding(false)
             .build();
 
-
+        log.info("DEBUG-Parquet Writer-Schema: " + schema);
         log.info("open: {} parquet writer succeed. {}", currentFileFullPath, writer);
         return writer;
     }

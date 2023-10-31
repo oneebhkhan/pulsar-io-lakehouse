@@ -71,6 +71,7 @@ public class SinkWriter implements Runnable {
     }
 
     public void run() {
+        log.info("DEBUG-Running Status Start: " + running);
         while (running) {
             try {
                 PulsarSinkRecord pulsarSinkRecord = messages.poll(100, TimeUnit.MILLISECONDS);
@@ -113,15 +114,18 @@ public class SinkWriter implements Runnable {
                     recordsCnt++;
                     commitIfNeed();
                 }
+
             } catch (Exception e) {
                 log.error("process record failed. ", e);
                 // fail the sink connector.
                 running = false;
             }
         }
+        log.info("DEBUG-Running Status End: " + running);
     }
 
     private void commitIfNeed() throws LakehouseConnectorException {
+        log.info("DEBUG-needCommit: " + needCommit());
         if (needCommit()) {
             if (log.isDebugEnabled()) {
                 log.debug("Commit ");
@@ -159,6 +163,7 @@ public class SinkWriter implements Runnable {
     }
 
     private boolean needCommit() {
+//        log.info("DEBUG: last"+);
         return System.currentTimeMillis() - lastCommitTime >= timeIntervalPerCommit
             || recordsCnt >= maxRecordsPerCommit;
     }
