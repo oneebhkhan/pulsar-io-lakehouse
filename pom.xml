@@ -89,6 +89,13 @@
     </license>
   </licenses>
 
+  <repositories>
+    <repository>
+      <id>codeartifact</id>
+      <url>https://din-global-187429986583.d.codeartifact.us-east-1.amazonaws.com/maven/din-global-data/</url>
+    </repository>
+  </repositories>
+
   <!-- keep all the dependencies used by all modules here -->
   <dependencyManagement>
     <dependencies>
