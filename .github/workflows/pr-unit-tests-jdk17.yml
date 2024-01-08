@@ -1,14 +1,15 @@
 name: lakehouse unit tests (JDK17)
 
 on:
-  pull_request:
-    branches:
-      - master
-      - branch-*
-  push:
-    branches:
-      - master
-      - branch-*
+#  pull_request:
+#    branches:
+#      - master
+#      - branch-*
+#  push:
+#    branches:
+#      - master
+#      - branch-*
+  workflow_dispatch:
 
 jobs:
   build:
